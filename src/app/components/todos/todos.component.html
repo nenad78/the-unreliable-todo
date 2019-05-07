@@ -1,3 +1,25 @@
-<p>
-  todos works!
-</p>
+<div *ngIf="isSessionCreated">
+  <app-todo-form></app-todo-form>
+
+  <div class="card card-body m-auto" style="width: 32rem;">
+    <h4>Start typing to search todos</h4>
+    <div class="form-group">
+      <input [(ngModel)]="searchText" class="form-control" placeholder="Search">
+    </div>
+  </div>
+
+  <ul class="list-group mt-3" *ngIf="todos?.length > 0">
+    <li *ngFor="let todo of todos | filter: searchText"
+      class="list-group-item d-flex justify-content-between align-items-center mb-1">
+      <p [ngClass]="{ done: todo.isCompleted === true }" class="mt-2 text-color lead">{{ todo.text }}</p>
+      <span class="log-date">{{ todo.created | date: 'short' }}</span>
+      <div>
+        <button (click)="onCheck(todo)" class="btn btn-success mr-2"><i class="fa fa-check-square"></i></button>
+        <button (click)="onDelete(todo)" class="btn btn-danger"><i class="fa fa-remove"></i></button>
+        <button (click)="onSelect(todo)" class="btn btn-warning ml-2"><i class="fa fa-pencil"></i></button>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<p *ngIf="!isSessionCreated">To manage your todos please go to create session section.</p>
