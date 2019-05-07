@@ -4,7 +4,7 @@
     <p>Enter number between 0 - 100</p>
     <form (submit)="onCreateSession(sessionForm)" #sessionForm="ngForm">
       <div class="form-group">
-        <input type="number" class="form-control" placeholder="Error rate" name="errorRate" ngModel
+        <input type="number" class="form-control" placeholder="Failure rate" name="errorRate" ngModel
           #errorRateInput="ngModel" required min="0" max="100">
         <span class="help-block" *ngIf="errorRateInput.invalid && errorRateInput.touched">Please enter a valid
           number.</span>
@@ -21,7 +21,7 @@
     <h6 class="card-subtitle mb-2 text-muted">Error rate: {{ sessionData.errorRate }}</h6>
     <form *ngIf="!isNew" class="mb-2" (submit)="onEditSession(editSessionForm)" #editSessionForm="ngForm">
       <div class="form-group">
-        <input type="number" class="form-control" name="sessionErrorRate" [(ngModel)]="sessionErrorRate">
+        <input type="number" class="form-control" name="sessionErrorRate" [(ngModel)]="sessionErrorRate" placeholder="Change failure rate">
       </div>
       <button class="btn btn-info" type="submit">Submit</button>
     </form>
