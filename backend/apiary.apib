@@ -1,0 +1,245 @@
+FORMAT: 1A
+HOST: localhost:9000/api
+
+# Frontend task
+
+This is the API for ROI Hunter's frontend task - the unreliable TODO
+
+Be aware, that there is a global rate limit of 500 requests per minute, after which you can receive a response of error 429.
+
+All endpoints, that use `sessionId` in headers can also return error 401, when the session doesn't exist and error 500 at random, based on the session's `errorRate`
+
+## Session [/session]
+    
+### Initialize a session [POST]
+
+Before you start working with the TODO API, you need to request a session id. A session lasts for 20 minutes after being last used.
+
++ Request (application/json)
+    + `errorRate` `(optional, 0 - 100, default: 50)` - Failure rate of the session.
+    
+    + Body
+    
+            {
+                "errorRate": 50
+            }
+
+
++ Response 201 (application/json)
+
+            {
+                "status": "OK",
+                "sessionId": "8e28a0bb-da74-4e78-8d4e-8956d55ee292",
+                "errorRate": 50
+            }
+        
++ Response 400 (application/json)
+
+            {
+                "status": "ERROR",
+                "error": "An error has occurred while creating a session. Please check Apiary for documentation."
+            }
+
+
+### Alter a session [PATCH]
+
+You can alter a session's failure rate on the fly.
+
++ Request (application/json)
+    + `errorRate` `(required, 0 - 100)` - New failure rate of the session.
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
+    + Body
+
+            {
+                "errorRate": 0
+            }
+
++ Response 200 (application/json)
+
+            {
+                "status": "OK",
+                "errorRate": 50
+            }
+        
++ Response 400 (application/json)
+
+            {
+                "status": "ERROR",
+                "error": "An error has occurred while altering a session. Please check Apiary for documentation."
+            }
+
+### Delete a session [DELETE]
+
++ Request (application/json)
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
++ Response 200 (application/json)
+
+            {
+                "status": "OK"
+            }
+        
+
+
+## TODOs [/todos]
+
+### Get all TODOs [GET]
+
++ Request
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
+
++ Response 200 (aplication/json)
+
+            {
+                "status": "OK",
+                "todos": {
+                    "05c4416f-2581-4116-bc14-01d8669590ac": {
+                        "id": "05c4416f-2581-4116-bc14-01d8669590ac",
+                        "text": "Feed the dog",
+                        "created": "2019-03-11T13:51:37.124Z",
+                        "updated": "2019-03-11T13:51:37.124Z",
+                        "isCompleted": true,
+                        "urgency": 5
+                    },
+                    "049d7e7b-230c-41f5-9fdf-b380d31e83ea": {
+                        "id": "049d7e7b-230c-41f5-9fdf-b380d31e83ea",
+                        "text": "Feed the baby",
+                        "created": "2019-03-11T07:08:33.216Z",
+                        "updated": "2019-03-12T06:33:30.495Z",
+                        "isCompleted": false,
+                        "urgency": 3
+                    },
+                    "d071a8dc-60c7-436c-aa94-8ced3e8ecda8": {
+                        "id": "d071a8dc-60c7-436c-aa94-8ced3e8ecda8",
+                        "text": "Take medicine",
+                        "created": "2019-03-12T02:03:42.179Z",
+                        "updated": "2019-03-12T02:03:42.179Z",
+                        "isCompleted": false,
+                        "urgency": 1
+                    }
+                }
+            }
+            
++ Response 500 (application/json)
+
+            {
+                "status": "ERROR",
+                "error": "An error has occurred while getting todos. Please try again."
+            }
+
+### Create a TODO [POST]
+
++ Request (application/json)
+    + `text` `(required, string)` - TODO's text
+    + `isCompleted` `(required, boolean)` - TODO's completion state
+    + `urgency` `(required, 1 - 5)` - TODO's urgency
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
+    + Body
+    
+            {
+                "text": "Think of something new to do",
+                "isCompleted": false,
+                "urgency": 5
+            }
+            
++ Response 201 (application/json)
+    
+            {
+                "status": "OK",
+                "todo": {
+                    "id": "4f338b4d-c2c4-4f86-9fb0-0753ac7e2ffe",
+                    "created": "2019-03-12T11:33:54.363Z",
+                    "updated": "2019-03-12T11:33:54.363Z",
+                    "text": "Think of something new to do",
+                    "isCompleted": false,
+                    "urgency": 5
+                }
+            }
+
+### Alter a TODO [PATCH /todos/{todoID}]
+
++ Parameters
+    + todoID (required, string) - ID of the TODO you want to alter
+
++ Request (application/json)
+    + `text` `(optional, string)` - TODO's text
+    + `isCompleted` `(optional, boolean)` - TODO's completion state
+    + `urgency` `(optional, 1 - 5)` - TODO's urgency
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
+    + Body
+    
+            {
+                "text": "Think of something new to do",
+                "isCompleted": false,
+                "urgency": 5
+            }
+            
++ Response 200 (application/json)
+
+            {
+                "status": "OK",
+                "todo": {
+                    "id": "d071a8dc-60c7-436c-aa94-8ced3e8ecda8",
+                    "text": "Think of something new to do",
+                    "created": "2019-03-12T02:03:42.179Z",
+                    "updated": "2019-03-12T11:29:23.194Z",
+                    "isCompleted": false,
+                    "urgency": 5
+                }
+            }
+
+### Delete a TODO [DELETE /todos/{todoID}]
+
++ Parameters
+    + todoID (required, string) - ID of the TODO you want to delete
+
++ Request (application/json)
+    + Headers
+    
+            sessionId: session Id received from the POST endpoint
+        
++ Response 404 (application/json)
+
+            {
+                "status": "ERROR",
+                "error": "An error has occurred while deleting a todo. Please check Apiary for documentation."
+            }
+
+
++ Response 200 (application/json)
+
+            {
+                "status": "OK",
+                "todos": {
+                    "049d7e7b-230c-41f5-9fdf-b380d31e83ea": {
+                        "id": "049d7e7b-230c-41f5-9fdf-b380d31e83ea",
+                        "text": "Feed the baby",
+                        "created": "2019-03-11T07:08:33.216Z",
+                        "updated": "2019-03-12T06:33:30.495Z",
+                        "isCompleted": false,
+                        "urgency": 5
+                    },
+                    "d071a8dc-60c7-436c-aa94-8ced3e8ecda8": {
+                        "id": "d071a8dc-60c7-436c-aa94-8ced3e8ecda8",
+                        "text": "Take medicine",
+                        "created": "2019-03-12T02:03:42.179Z",
+                        "updated": "2019-03-12T02:03:42.179Z",
+                        "isCompleted": false
+                        "urgency": 5
+                    }
+                }
+            }
